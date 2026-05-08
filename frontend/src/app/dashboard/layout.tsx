@@ -41,12 +41,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-background overflow-hidden selection:bg-blue-500/30">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         <Topbar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="ml-0 lg:ml-64">{children}</div>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-background">
+          <div className="lg:ml-64 relative min-h-[calc(100vh-4rem)]">
+            <div className="max-w-7xl mx-auto w-full">
+              {children}
+            </div>
+          </div>
         </main>
       </div>
     </div>

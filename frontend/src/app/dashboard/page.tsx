@@ -7,9 +7,12 @@ import {
   Building2,
   Bookmark,
   Clock,
+  ArrowRight,
 } from 'lucide-react';
 import { mockDashboardStats, mockJobs } from '@/lib/mockData';
 import { formatDateTime, getRelativeTime } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const stats = mockDashboardStats;
@@ -18,12 +21,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
         <p className="mt-2 text-muted-foreground">
-          Welcome to JobScout. Here&apos;s an overview of your job tracking.
+          Welcome back. Here&apos;s a high-level overview of your job intelligence tracking.
         </p>
-      </div>
+      </motion.div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -33,18 +40,21 @@ export default function DashboardPage() {
           icon={Briefcase}
           trend={{ value: 12, isPositive: true }}
           description="Across all sources"
+          delay={0.1}
         />
         <StatCard
           label="New Today"
           value={stats.newJobsToday}
           icon={TrendingUp}
           description="Jobs posted today"
+          delay={0.15}
         />
         <StatCard
           label="Companies"
           value={stats.companiesTracked}
           icon={Building2}
           description="Being monitored"
+          delay={0.2}
         />
         <StatCard
           label="Saved Jobs"
@@ -52,66 +62,74 @@ export default function DashboardPage() {
           icon={Bookmark}
           trend={{ value: 3, isPositive: true }}
           description="Bookmarked"
+          delay={0.25}
         />
         <StatCard
           label="Last Scrape"
           value={getRelativeTime(stats.lastScrapeTime)}
           icon={Clock}
           description={formatDateTime(stats.lastScrapeTime)}
+          delay={0.3}
         />
       </div>
 
       {/* Recent Jobs Section */}
-      <div className="rounded-lg border border-border bg-white shadow-sm">
-        <div className="border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Recent Jobs</h2>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+      >
+        <div className="border-b border-border px-6 py-5 flex items-center justify-between bg-muted/20">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">Recent Discoveries</h2>
+          <Link href="/jobs" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 group transition-colors">
+            View all
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b border-border bg-gray-50">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-muted-foreground uppercase bg-muted/40 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Job Title
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Company
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Match
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Date Found
-                </th>
+                <th className="px-6 py-4 font-medium">Role</th>
+                <th className="px-6 py-4 font-medium">Company</th>
+                <th className="px-6 py-4 font-medium">Match Score</th>
+                <th className="px-6 py-4 font-medium">Found</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border">
               {recentJobs.map((job) => (
                 <tr
                   key={job.id}
-                  className="border-b border-border hover:bg-gray-50 transition-colors"
+                  className="bg-card hover:bg-muted/30 transition-colors group"
                 >
                   <td className="px-6 py-4">
-                    <p className="font-medium text-foreground">{job.title}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm text-muted-foreground">{job.company}</p>
+                    <p className="font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{job.title}</p>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-12 bg-gray-200 rounded-full h-2">
+                      <div className="w-6 h-6 rounded bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+                        {job.company.charAt(0)}
+                      </div>
+                      <span className="font-medium text-muted-foreground">{job.company}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 bg-secondary rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-blue-600 h-2 rounded-full"
+                          className="bg-emerald-500 h-1.5 rounded-full"
                           style={{ width: `${job.matchScore}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-foreground">
+                      <span className="text-xs font-semibold text-foreground font-mono">
                         {job.matchScore}%
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground">
                       {getRelativeTime(job.dateFound)}
                     </p>
                   </td>
@@ -120,16 +138,7 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
-
-        <div className="border-t border-border px-6 py-4">
-          <a
-            href="/jobs"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
-          >
-            View all jobs →
-          </a>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

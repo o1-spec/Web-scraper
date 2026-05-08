@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
 import { ToastContainer } from '@/components/Toast';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -19,14 +20,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50">
-        <AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <AuthProvider>
           <ToastProvider>
             {children}
             <ToastContainer />
           </ToastProvider>
         </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

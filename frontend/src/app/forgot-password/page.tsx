@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Loader, ArrowLeft } from 'lucide-react';
+import { Mail, Loader2, ArrowLeft, Send } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
+import AuthLayout from '@/components/layout/AuthLayout';
+import { motion } from 'framer-motion';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -32,7 +34,7 @@ export default function ForgotPasswordPage() {
     try {
       await resetPassword(email);
       setSubmitted(true);
-      addToast('Check your email for password reset instructions', 'success');
+      addToast('Check your email for instructions', 'success');
     } catch (err) {
       addToast((err as Error).message || 'Failed to send reset email', 'error');
       setError((err as Error).message || 'Failed to send reset email');
@@ -40,92 +42,96 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">JobScout</h1>
-          <p className="text-gray-600">Reset your password</p>
-        </div>
+    <AuthLayout
+      title="Secure your account access."
+      subtitle="We'll help you get back on track so you can continue monitoring the best career opportunities."
+    >
+      <div className="space-y-6">
+        {!submitted ? (
+          <>
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Reset password
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Enter your email and we&apos;ll send you a reset link
+              </p>
+            </div>
 
-        {/* Reset Card */}
-        <div className="bg-white rounded-lg shadow-lg p-8 space-y-6">
-          {!submitted ? (
-            <>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Forgot your password?</h2>
-                <p className="text-gray-600 text-sm mt-1">
-                  No worries. Enter your email address and we&apos;ll send you a link to reset your password.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Input */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (error) setError('');
-                      }}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                        error ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="you@example.com"
-                    />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <label htmlFor="email" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Email Address
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+                    <Mail className="h-4 w-4" />
                   </div>
-                  {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError('');
+                    }}
+                    className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 pl-9 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-shadow ${
+                      error ? 'border-destructive focus-visible:ring-destructive' : 'border-input hover:border-border/80'
+                    }`}
+                    placeholder="you@example.com"
+                  />
                 </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  {isLoading ? <Loader className="h-5 w-5 animate-spin" /> : null}
-                  {isLoading ? 'Sending...' : 'Send Reset Link'}
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <div className="text-center py-4">
-                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                  <Mail className="h-6 w-6 text-green-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">Check your email</h2>
-                <p className="text-gray-600 text-sm mt-2">
-                  We&apos;ve sent a password reset link to <strong>{email}</strong>
-                </p>
-                <p className="text-gray-600 text-sm mt-4">
-                  The link will expire in 24 hours. If you don&apos;t see the email, check your spam folder.
-                </p>
+                {error && <p className="text-[0.8rem] font-medium text-destructive mt-1">{error}</p>}
               </div>
 
               <button
-                onClick={() => router.push('/login')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors"
+                type="submit"
+                disabled={isLoading}
+                className="inline-flex items-center justify-center w-full rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2 group shadow-sm"
               >
-                Back to Login
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                {isLoading ? 'Sending link...' : 'Send reset link'}
+                {!isLoading && <Send className="ml-2 h-4 w-4 opacity-70 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />}
               </button>
-            </>
-          )}
+            </form>
+          </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-4 py-4"
+          >
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/10 mb-2">
+              <Mail className="h-8 w-8 text-emerald-600 dark:text-emerald-500" />
+            </div>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+              Check your email
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              We&apos;ve sent a password reset link to <span className="font-medium text-foreground">{email}</span>
+            </p>
+            <p className="text-xs text-muted-foreground pt-2">
+              The link will expire in 24 hours. If you don&apos;t see it, check your spam folder.
+            </p>
 
-          {/* Back to Login Link */}
-          <Link href="/login" className="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Login
+            <button
+              onClick={() => router.push('/login')}
+              className="inline-flex items-center justify-center w-full rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-4 shadow-sm"
+            >
+              Return to sign in
+            </button>
+          </motion.div>
+        )}
+
+        <div className="flex justify-center pt-2">
+          <Link href="/login" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group">
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Back to login
           </Link>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Tag, Info } from 'lucide-react';
 import { mockKeywords } from '@/lib/mockData';
 import { Keyword } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function KeywordsPage() {
   const [keywords, setKeywords] = useState<Keyword[]>(mockKeywords);
@@ -28,130 +29,178 @@ export default function KeywordsPage() {
   };
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Keywords</h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage keywords to track specific roles, technologies, and seniority levels.
-        </p>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+      >
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Target Keywords</h1>
+          <p className="mt-2 text-muted-foreground">
+            Define specific roles, technologies, and seniority levels to match against job descriptions.
+          </p>
+        </div>
+        <div className="text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center gap-2">
+          <Tag className="h-4 w-4" />
+          {keywords.length} Active
+        </div>
+      </motion.div>
 
-      {/* Add Keyword Form */}
-      <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Add New Keyword</h2>
-        <form onSubmit={handleAdd} className="flex gap-3">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="e.g., React, senior, remote..."
-            className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Add Keyword Form */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="rounded-xl border border-border bg-card p-6 shadow-sm"
           >
-            <Plus className="h-4 w-4" />
-            Add
-          </button>
-        </form>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Keywords will help JobScout match relevant job postings to your interests.
-        </p>
-      </div>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground mb-4">Add Targeting Rule</h2>
+            <form onSubmit={handleAdd} className="flex gap-3">
+              <div className="relative flex-1 group">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+                  <Tag className="h-4 w-4" />
+                </div>
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="e.g., React, Senior, Staff Engineer, Remote..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={!inputValue.trim()}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-medium shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <Plus className="h-4 w-4" />
+                Add
+              </button>
+            </form>
+          </motion.div>
 
-      {/* Keywords List */}
-      <div className="rounded-lg border border-border bg-white shadow-sm overflow-hidden">
-        <div className="border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">
-            Tracked Keywords ({keywords.length})
-          </h2>
+          {/* Keywords List */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="rounded-xl border border-border bg-card shadow-sm overflow-hidden min-h-[400px] flex flex-col"
+          >
+            <div className="border-b border-border px-6 py-4 bg-muted/20">
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">
+                Active Keywords
+              </h2>
+            </div>
+
+            {keywords.length > 0 ? (
+              <div className="divide-y divide-border flex-1 overflow-y-auto">
+                <AnimatePresence initial={false}>
+                  {keywords.map((keyword) => (
+                    <motion.div
+                      key={keyword.id}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="px-6 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                          <Tag className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground group-hover:text-primary transition-colors">{keyword.keyword}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Added {formatDate(keyword.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDelete(keyword.id)}
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                        title="Remove Keyword"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="p-12 text-center flex-1 flex flex-col justify-center items-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
+                    <Tag className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold tracking-tight text-foreground mb-1">
+                  No keywords added
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Start adding keywords above to improve your job match score.
+                </p>
+              </div>
+            )}
+          </motion.div>
         </div>
 
-        {keywords.length > 0 ? (
-          <div className="divide-y divide-border">
-            {keywords.map((keyword) => (
-              <div
-                key={keyword.id}
-                className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">{keyword.keyword}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Added on {formatDate(keyword.createdAt)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleDelete(keyword.id)}
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                  title="Delete"
-                >
-                  <X className="h-5 w-5 text-gray-600" />
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="p-12 text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg
-                  className="h-6 w-6 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.972 1.972 0 013 12V7a4 4 0 014-4z"
-                  />
-                </svg>
-              </div>
+        {/* Info / Guide Sidebar */}
+        <motion.div
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="space-y-6"
+        >
+          <div className="rounded-xl border border-blue-500/20 bg-blue-50/50 dark:bg-blue-500/5 p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-4">
+              <Info className="h-5 w-5" />
+              <h3 className="font-semibold tracking-tight">How it works</h3>
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              No keywords yet
-            </h3>
-            <p className="text-muted-foreground">
-              Add keywords above to start matching relevant jobs.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Keywords are used to generate your <strong>Match Score</strong> for each job. The more matched keywords found in a job&apos;s title and description, the higher the score.
             </p>
           </div>
-        )}
-      </div>
 
-      {/* Examples Section */}
-      <div className="rounded-lg border border-border bg-blue-50 p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Keyword Examples</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-medium text-blue-900 mb-2">Technologies</h4>
-            <div className="flex flex-wrap gap-2">
-              {['React', 'Next.js', 'TypeScript', 'Node.js', 'Python'].map((tech) => (
-                <span
-                  key={tech}
-                  className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white text-blue-700"
-                >
-                  {tech}
-                </span>
-              ))}
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase mb-4">Common Examples</h3>
+            
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-3">Technologies</h4>
+                <div className="flex flex-wrap gap-2">
+                  {['React', 'Next.js', 'TypeScript', 'Node.js', 'Python'].map((tech) => (
+                    <button
+                      key={tech}
+                      onClick={() => setInputValue(tech)}
+                      className="inline-block px-3 py-1.5 rounded-md text-xs font-medium bg-muted text-foreground hover:bg-primary hover:text-primary-foreground transition-colors border border-transparent hover:border-primary/20 shadow-sm"
+                    >
+                      {tech}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium text-foreground mb-3">Seniority Levels</h4>
+                <div className="flex flex-wrap gap-2">
+                  {['Junior', 'Entry Level', 'Senior', 'Lead', 'Staff', 'Principal'].map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setInputValue(level)}
+                      className="inline-block px-3 py-1.5 rounded-md text-xs font-medium bg-muted text-foreground hover:bg-primary hover:text-primary-foreground transition-colors border border-transparent hover:border-primary/20 shadow-sm"
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <h4 className="font-medium text-blue-900 mb-2">Seniority Levels</h4>
-            <div className="flex flex-wrap gap-2">
-              {['Junior', 'Entry Level', 'Senior', 'Lead', 'Intern', 'Graduate'].map((level) => (
-                <span
-                  key={level}
-                  className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white text-blue-700"
-                >
-                  {level}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
