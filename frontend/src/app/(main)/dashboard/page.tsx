@@ -3,25 +3,36 @@
 import { StatCard } from '@/components/dashboard/StatCard';
 import {
   Briefcase,
-  TrendingUp,
   Building2,
-  Bookmark,
-  Clock,
   ArrowRight,
+
+  Bookmark,
+
+  Clock,
+  TrendingUp,
 } from 'lucide-react';
-import { mockDashboardStats, mockJobs } from '@/lib/mockData';
-import { formatDateTime, getRelativeTime } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
+import { formatDateTime, getRelativeTime } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const stats = mockDashboardStats;
-  const recentJobs = mockJobs.slice(0, 5);
+  const { data: stats } = useSWR('/api/dashboard/stats', fetcher);
+  const { data: recentJobs } = useSWR('/api/dashboard/recent-jobs', fetcher);
+
+  const mockStats = stats || {
+    totalJobs: 0,
+    newJobsToday: 0,
+    companiesTracked: 0,
+    savedJobs: 0,
+    lastScrapeTime: new Date()
+  };
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -36,7 +47,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="Total Jobs"
-          value={stats.totalJobs}
+          value={mockStats.totalJobs}
           icon={Briefcase}
           trend={{ value: 12, isPositive: true }}
           description="Across all sources"
@@ -44,21 +55,21 @@ export default function DashboardPage() {
         />
         <StatCard
           label="New Today"
-          value={stats.newJobsToday}
+          value={mockStats.newJobsToday}
           icon={TrendingUp}
           description="Jobs posted today"
           delay={0.15}
         />
         <StatCard
           label="Companies"
-          value={stats.companiesTracked}
+          value={mockStats.companiesTracked}
           icon={Building2}
           description="Being monitored"
           delay={0.2}
         />
         <StatCard
           label="Saved Jobs"
-          value={stats.savedJobs}
+          value={mockStats.savedJobs}
           icon={Bookmark}
           trend={{ value: 3, isPositive: true }}
           description="Bookmarked"
@@ -66,15 +77,15 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Last Scrape"
-          value={getRelativeTime(stats.lastScrapeTime)}
+          value={getRelativeTime(mockStats.lastScrapeTime)}
           icon={Clock}
-          description={formatDateTime(stats.lastScrapeTime)}
+          description={formatDateTime(mockStats.lastScrapeTime)}
           delay={0.3}
         />
       </div>
 
       {/* Recent Jobs Section */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
@@ -99,8 +110,11 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {recentJobs.map((job) => (
-                <tr
+              {recentJobs ? recentJobs.map((job: any, index: number) => (
+                <motion.tr
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
                   key={job.id}
                   className="bg-card hover:bg-muted/30 transition-colors group"
                 >
@@ -133,8 +147,8 @@ export default function DashboardPage() {
                       {getRelativeTime(job.dateFound)}
                     </p>
                   </td>
-                </tr>
-              ))}
+                </motion.tr>
+              )) : <tr><td colSpan={4} className="px-6 py-4 text-center">Loading...</td></tr>}
             </tbody>
           </table>
         </div>

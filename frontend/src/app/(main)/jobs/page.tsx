@@ -1,94 +1,55 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { JobFilters, JobFiltersState } from '@/components/jobs/JobFilters';
+import { useState } from 'react';
+import { JobFilters as FiltersComponent } from '@/components/jobs/JobFilters';
 import { JobCard } from '@/components/jobs/JobCard';
-import { mockJobs } from '@/lib/mockData';
-import { Job } from '@/types';
-import { motion } from 'framer-motion';
+import { JobFiltersState as JobFilters } from '@/components/jobs/JobFilters';
+import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<Job[]>(mockJobs);
-  const [filters, setFilters] = useState<JobFiltersState>({
+  const [filters, setFilters] = useState<JobFilters>({
     keyword: '',
-    company: '',
-    location: '',
+    company: 'all',
     locationType: 'all',
     jobType: 'all',
-    source: 'all',
     savedOnly: false,
     newOnly: false,
   });
 
-  const filteredJobs = useMemo(() => {
-    let filtered = jobs;
+  const queryParams = new URLSearchParams();
+  if (filters.keyword) queryParams.append('keyword', filters.keyword);
+  if (filters.company !== 'all') queryParams.append('company', filters.company);
+  if (filters.locationType !== 'all') queryParams.append('locationType', filters.locationType);
+  if (filters.jobType !== 'all') queryParams.append('jobType', filters.jobType);
+  if (filters.savedOnly) queryParams.append('savedOnly', 'true');
+  if (filters.newOnly) queryParams.append('newOnly', 'true');
 
-    if (filters.keyword) {
-      const keyword = filters.keyword.toLowerCase();
-      filtered = filtered.filter(
-        (job) =>
-          job.title.toLowerCase().includes(keyword) ||
-          job.description?.toLowerCase().includes(keyword) ||
-          job.tags.some((tag) => tag.toLowerCase().includes(keyword))
-      );
-    }
-    if (filters.company) {
-      const company = filters.company.toLowerCase();
-      filtered = filtered.filter((job) =>
-        job.company.toLowerCase().includes(company)
-      );
-    }
-    if (filters.location) {
-      const location = filters.location.toLowerCase();
-      filtered = filtered.filter((job) =>
-        job.location.toLowerCase().includes(location)
-      );
-    }
-    if (filters.locationType !== 'all') {
-      filtered = filtered.filter((job) => job.locationType === filters.locationType);
-    }
-    if (filters.jobType !== 'all') {
-      filtered = filtered.filter((job) => job.jobType === filters.jobType);
-    }
-    if (filters.source !== 'all') {
-      filtered = filtered.filter((job) => job.source === filters.source);
-    }
-    if (filters.savedOnly) {
-      filtered = filtered.filter((job) => job.isSaved);
-    }
-    if (filters.newOnly) {
-      const today = new Date();
-      filtered = filtered.filter(
-        (job) => job.dateFound.toDateString() === today.toDateString()
-      );
-    }
+  const { data: jobs = [], mutate } = useSWR(`/api/jobs?${queryParams.toString()}`, fetcher);
 
-    return filtered;
-  }, [jobs, filters]);
-
-  const handleFiltersChange = (newFilters: JobFiltersState) => {
+  const handleFiltersChange = (newFilters: JobFilters) => {
     setFilters(newFilters);
   };
 
   const handleReset = () => {
     setFilters({
       keyword: '',
-      company: '',
-      location: '',
+      company: 'all',
       locationType: 'all',
       jobType: 'all',
-      source: 'all',
       savedOnly: false,
       newOnly: false,
     });
   };
 
-  const handleSaveToggle = (jobId: string) => {
-    setJobs(
-      jobs.map((job) =>
-        job.id === jobId ? { ...job, isSaved: !job.isSaved } : job
-      )
-    );
+  const handleToggleSave = async (jobId: string) => {
+    try {
+      await fetch(`/api/jobs/${jobId}/save`, { method: 'POST' });
+      mutate();
+    } catch(err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -107,7 +68,7 @@ export default function JobsPage() {
           </p>
         </div>
         <div className="text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-          {filteredJobs.length} {filteredJobs.length === 1 ? 'Match' : 'Matches'} Found
+          {jobs.length} {jobs.length === 1 ? 'Match' : 'Matches'} Found
         </div>
       </motion.div>
 
@@ -117,21 +78,23 @@ export default function JobsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <JobFilters onFiltersChange={handleFiltersChange} onReset={handleReset} />
+        <FiltersComponent onFiltersChange={handleFiltersChange} onReset={handleReset} />
       </motion.div>
 
       {/* Jobs Grid */}
       <div className="pt-2">
-        {filteredJobs.length > 0 ? (
+        {jobs && jobs.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-            {filteredJobs.map((job, index) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                onSaveToggle={handleSaveToggle}
-                index={index}
-              />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {jobs.map((job: any, index: number) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  onSaveToggle={handleToggleSave}
+                  index={index}
+                />
+              ))}
+            </AnimatePresence>
           </div>
         ) : (
           <motion.div 

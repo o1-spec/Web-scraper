@@ -7,10 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 export interface JobFiltersState {
   keyword: string;
   company: string;
-  location: string;
   locationType: string;
   jobType: string;
-  source: string;
   savedOnly: boolean;
   newOnly: boolean;
 }
@@ -23,11 +21,9 @@ interface JobFiltersProps {
 export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
   const [filters, setFilters] = useState<JobFiltersState>({
     keyword: '',
-    company: '',
-    location: '',
+    company: 'all',
     locationType: 'all',
     jobType: 'all',
-    source: 'all',
     savedOnly: false,
     newOnly: false,
   });
@@ -43,11 +39,9 @@ export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
   const handleReset = () => {
     const emptyFilters: JobFiltersState = {
       keyword: '',
-      company: '',
-      location: '',
+      company: 'all',
       locationType: 'all',
       jobType: 'all',
-      source: 'all',
       savedOnly: false,
       newOnly: false,
     };
@@ -130,18 +124,7 @@ export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., San Francisco"
-                    value={filters.location}
-                    onChange={(e) => handleChange('location', e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
-                  />
-                </div>
+
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -178,26 +161,9 @@ export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
               </div>
 
               {/* Row 2 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 pt-4 border-t border-border/50">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Source
-                  </label>
-                  <select
-                    value={filters.source}
-                    onChange={(e) => handleChange('source', e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm appearance-none cursor-pointer"
-                  >
-                    <option value="all">All Sources</option>
-                    <option value="greenhouse">Greenhouse</option>
-                    <option value="lever">Lever</option>
-                    <option value="ashby">Ashby</option>
-                    <option value="custom">Custom Tracker</option>
-                  </select>
-                </div>
-
+              <div className="grid grid-cols-1 gap-5 pt-4 border-t border-border/50">
                 {/* Toggles */}
-                <div className="lg:col-span-3 flex items-end gap-6 pb-1">
+                <div className="flex items-end gap-6 pb-1">
                   <label className="flex items-center gap-2.5 cursor-pointer group">
                     <div className="relative flex items-center">
                       <input

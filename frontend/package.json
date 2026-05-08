@@ -6,19 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "worker": "ts-node --compiler-options {\"module\":\"CommonJS\"} worker.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.76.6",
+    "cheerio": "^1.2.0",
     "clsx": "^2.0.0",
     "framer-motion": "^12.38.0",
+    "ioredis": "^5.10.1",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.263.0",
     "next": "^14.0.0",
     "next-themes": "^0.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-merge": "^2.2.0"
+    "swr": "^2.4.1",
+    "tailwind-merge": "^2.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
@@ -26,7 +37,12 @@
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.0",
     "postcss": "^8.4.31",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.3.6",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

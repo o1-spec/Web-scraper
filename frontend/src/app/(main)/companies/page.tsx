@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, RotateCcw, Building2, Search, X } from 'lucide-react';
-import { mockCompanies } from '@/lib/mockData';
 import { Company, SourceType } from '@/types';
 import { formatDateTime, getRelativeTime, getStatusBadgeColor, getSourceTypeLabel } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 interface FormData {
   name: string;
@@ -14,7 +15,7 @@ interface FormData {
 }
 
 export default function CompaniesPage() {
-  const [companies, setCompanies] = useState<Company[]>(mockCompanies);
+  const { data: companies, mutate } = useSWR<Company[]>('/api/companies', fetcher, { fallbackData: [] });
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,58 +41,52 @@ export default function CompaniesPage() {
     setShowModal(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.careerPageUrl) {
       alert('Please fill in all fields');
       return;
     }
 
-    if (editingId) {
-      setCompanies(
-        companies.map((c) =>
-          c.id === editingId
-            ? {
-              ...c,
-              name: formData.name,
-              careerPageUrl: formData.careerPageUrl,
-              sourceType: formData.sourceType,
-            }
-            : c
-        )
-      );
-    } else {
-      const newCompany: Company = {
-        id: Date.now().toString(),
-        name: formData.name,
-        careerPageUrl: formData.careerPageUrl,
-        sourceType: formData.sourceType,
-        lastChecked: new Date(),
-        jobsFound: 0,
-        status: 'pending',
-      };
-      setCompanies([...companies, newCompany]);
+    try {
+      if (editingId) {
+        await fetch(`/api/companies/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+      } else {
+        await fetch('/api/companies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+      }
+      mutate();
+      setShowModal(false);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to save company');
     }
-
-    setShowModal(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this company?')) {
-      setCompanies(companies.filter((c) => c.id !== id));
+      await fetch(`/api/companies/${id}`, { method: 'DELETE' });
+      mutate();
     }
   };
 
-  const handleRefresh = (id: string) => {
-    setCompanies(
-      companies.map((c) =>
-        c.id === id
-          ? { ...c, status: 'pending' as const, lastChecked: new Date() }
-          : c
-      )
-    );
+  const handleRefresh = async (id: string) => {
+    try {
+      await fetch(`/api/companies/${id}/refresh`, { method: 'POST' });
+      alert('Scraping job queued!');
+      mutate();
+    } catch (e) {
+      alert('Failed to refresh');
+    }
   };
 
-  const filteredCompanies = companies.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredCompanies = companies ? companies.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">

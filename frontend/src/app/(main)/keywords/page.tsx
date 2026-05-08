@@ -2,36 +2,46 @@
 
 import { useState } from 'react';
 import { Plus, X, Tag, Info } from 'lucide-react';
-import { mockKeywords } from '@/lib/mockData';
 import { Keyword } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function KeywordsPage() {
-  const [keywords, setKeywords] = useState<Keyword[]>(mockKeywords);
+  const { data: keywords, mutate } = useSWR<Keyword[]>('/api/keywords', fetcher, { fallbackData: [] });
   const [inputValue, setInputValue] = useState('');
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      const newKeyword: Keyword = {
-        id: Date.now().toString(),
-        keyword: inputValue.trim(),
-        createdAt: new Date(),
-      };
-      setKeywords([newKeyword, ...keywords]);
-      setInputValue('');
+      try {
+        await fetch('/api/keywords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keyword: inputValue.trim() }),
+        });
+        mutate();
+        setInputValue('');
+      } catch (err) {
+        alert('Failed to add keyword');
+      }
     }
   };
 
-  const handleDelete = (id: string) => {
-    setKeywords(keywords.filter((k) => k.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`/api/keywords/${id}`, { method: 'DELETE' });
+      mutate();
+    } catch (err) {
+      alert('Failed to delete keyword');
+    }
   };
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -45,14 +55,14 @@ export default function KeywordsPage() {
         </div>
         <div className="text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 flex items-center gap-2">
           <Tag className="h-4 w-4" />
-          {keywords.length} Active
+          {keywords ? keywords.length : 0} Active
         </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Add Keyword Form */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
@@ -84,7 +94,7 @@ export default function KeywordsPage() {
           </motion.div>
 
           {/* Keywords List */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
@@ -96,7 +106,7 @@ export default function KeywordsPage() {
               </h2>
             </div>
 
-            {keywords.length > 0 ? (
+            {keywords && keywords.length > 0 ? (
               <div className="divide-y divide-border flex-1 overflow-y-auto">
                 <AnimatePresence initial={false}>
                   {keywords.map((keyword) => (
@@ -167,7 +177,7 @@ export default function KeywordsPage() {
 
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase mb-4">Common Examples</h3>
-            
+
             <div className="space-y-6">
               <div>
                 <h4 className="text-sm font-medium text-foreground mb-3">Technologies</h4>

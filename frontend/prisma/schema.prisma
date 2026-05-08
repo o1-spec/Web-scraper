@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  companies      Company[]
+  keywords       Keyword[]
+  savedJobs      SavedJob[]
+  digestSettings DigestSettings?
+}
+
+model Company {
+  id            String       @id @default(uuid())
+  userId        String
+  name          String
+  careerPageUrl String
+  sourceType    String       // "greenhouse", "lever", "ashby", "custom"
+  status        String       @default("pending") // "active", "pending", "error"
+  lastChecked   DateTime?
+  jobsFound     Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs          Job[]
+  scrapeRuns    ScrapeRun[]
+
+  @@unique([userId, careerPageUrl])
+}
+
+model Job {
+  id           String      @id @default(uuid())
+  companyId    String
+  title        String
+  location     String
+  locationType String      // "remote", "on-site", "hybrid"
+  jobType      String      // "full-time", "part-time", "contract", "internship"
+  source       String      // "greenhouse", "lever", etc.
+  jobLink      String      @unique
+  description  String?
+  tags         String[]
+  matchScore   Int         @default(0)
+  dateFound    DateTime    @default(now())
+
+  company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  savedBy      SavedJob[]
+}
+
+model SavedJob {
+  id        String   @id @default(uuid())
+  userId    String
+  jobId     String
+  savedAt   DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+}
+
+model Keyword {
+  id        String   @id @default(uuid())
+  userId    String
+  keyword   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, keyword])
+}
+
+model DigestSettings {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  enabled           Boolean  @default(false)
+  emailAddress      String
+  frequency         String   @default("daily") // "daily", "every-2-days", "weekly"
+  preferredTime     String   @default("09:00") // 24h format
+  minimumMatchScore Int      @default(0)
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ScrapeRun {
+  id          String   @id @default(uuid())
+  companyId   String
+  status      String   // "running", "completed", "failed"
+  jobsFound   Int      @default(0)
+  error       String?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}

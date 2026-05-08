@@ -2,28 +2,49 @@
 
 import { useState } from 'react';
 import { Bell, Mail, Clock, Shield, Key, Webhook, Check } from 'lucide-react';
-import { mockDigestSettings } from '@/lib/mockData';
 import { DigestSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<DigestSettings>(mockDigestSettings);
+  const { data: serverSettings, mutate } = useSWR<DigestSettings>('/api/settings', fetcher);
+  const [settings, setSettings] = useState<DigestSettings | null>(null);
   const [saved, setSaved] = useState(false);
 
+  // Sync server data to local state when it loads
+  if (serverSettings && !settings) {
+    setSettings(serverSettings);
+  }
+
   const handleChange = (key: keyof DigestSettings, value: any) => {
+    if (!settings) return;
     setSettings({ ...settings, [key]: value });
     setSaved(false);
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleSave = async () => {
+    if (!settings) return;
+    try {
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      mutate();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      alert('Failed to save settings');
+    }
   };
+
+  if (!settings) return <div className="p-8">Loading settings...</div>;
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -40,7 +61,7 @@ export default function SettingsPage() {
       {/* Settings Grid */}
       <div className="grid gap-8 md:grid-cols-3">
         {/* Left Column: Navigation/Sections (Placeholder for future routing, currently visual) */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
@@ -65,7 +86,7 @@ export default function SettingsPage() {
         </motion.div>
 
         {/* Right Column: Settings Content */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
@@ -77,7 +98,7 @@ export default function SettingsPage() {
               <h2 className="text-lg font-semibold tracking-tight text-foreground">Email Notifications</h2>
               <p className="text-sm text-muted-foreground mt-1">Configure how and when you receive job updates.</p>
             </div>
-            
+
             <div className="p-6 space-y-8">
               {/* Enable Toggle */}
               <div className="flex items-center justify-between">
