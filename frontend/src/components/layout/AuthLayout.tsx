@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Activity, ShieldCheck, Database, Zap } from 'lucide-react';
+import { Activity, Database, Zap } from 'lucide-react';
 
 export default function AuthLayout({
   children,
@@ -53,7 +53,7 @@ export default function AuthLayout({
             {/* Fake Dashboard/Metrics Snippet */}
             <div className="bg-zinc-900/50 backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-2xl relative">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-              
+
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>

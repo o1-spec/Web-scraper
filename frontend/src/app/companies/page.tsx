@@ -51,11 +51,11 @@ export default function CompaniesPage() {
         companies.map((c) =>
           c.id === editingId
             ? {
-                ...c,
-                name: formData.name,
-                careerPageUrl: formData.careerPageUrl,
-                sourceType: formData.sourceType,
-              }
+              ...c,
+              name: formData.name,
+              careerPageUrl: formData.careerPageUrl,
+              sourceType: formData.sourceType,
+            }
             : c
         )
       );
@@ -96,7 +96,7 @@ export default function CompaniesPage() {
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -118,7 +118,7 @@ export default function CompaniesPage() {
       </motion.div>
 
       {/* Toolbar */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
@@ -139,7 +139,7 @@ export default function CompaniesPage() {
       </motion.div>
 
       {/* Table */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
@@ -278,7 +278,7 @@ export default function CompaniesPage() {
               className="absolute inset-0 bg-background/80 backdrop-blur-sm"
               onClick={() => setShowModal(false)}
             />
-            
+
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -290,7 +290,7 @@ export default function CompaniesPage() {
                 <h2 className="text-lg font-semibold tracking-tight text-foreground">
                   {editingId ? 'Edit Tracker' : 'New Company Tracker'}
                 </h2>
-                <button 
+                <button
                   onClick={() => setShowModal(false)}
                   className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors"
                 >
@@ -321,7 +321,7 @@ export default function CompaniesPage() {
                     value={formData.careerPageUrl}
                     onChange={(e) => setFormData({ ...formData, careerPageUrl: e.target.value })}
                     placeholder="https://company.com/careers"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-mono text-xs"
+                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-mono"
                   />
                 </div>
 
