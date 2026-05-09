@@ -6,9 +6,10 @@ import { DigestSettings } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 export default function SettingsPage() {
-  const { data: serverSettings, mutate } = useSWR<DigestSettings>('/api/settings', fetcher);
+  const { data: serverSettings, mutate, isLoading } = useSWR<DigestSettings>('/api/settings', fetcher);
   const [settings, setSettings] = useState<DigestSettings | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -39,7 +40,23 @@ export default function SettingsPage() {
     }
   };
 
-  if (!settings) return <div className="p-8">Loading settings...</div>;
+  if (isLoading || !settings) {
+    return (
+      <div className="p-8 max-w-4xl mx-auto space-y-8">
+        <div className="h-10 w-48 bg-muted rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="space-y-3">
+             <div className="h-10 bg-muted rounded animate-pulse" />
+             <div className="h-10 bg-muted rounded animate-pulse" />
+             <div className="h-10 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="md:col-span-2">
+            <SkeletonLoader count={2} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">

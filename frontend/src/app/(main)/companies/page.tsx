@@ -7,6 +7,7 @@ import { formatDateTime, getRelativeTime, getStatusBadgeColor, getSourceTypeLabe
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 interface FormData {
   name: string;
@@ -15,7 +16,7 @@ interface FormData {
 }
 
 export default function CompaniesPage() {
-  const { data: companies, mutate } = useSWR<Company[]>('/api/companies', fetcher, { fallbackData: [] });
+  const { data: companies, mutate, isLoading } = useSWR<Company[]>('/api/companies', fetcher, { fallbackData: [] });
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -138,9 +139,11 @@ export default function CompaniesPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+        className="rounded-xl border border-border bg-card shadow-sm overflow-hidden p-6"
       >
-        {filteredCompanies.length > 0 ? (
+        {isLoading ? (
+          <SkeletonLoader count={5} type="table-row" />
+        ) : filteredCompanies.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-muted-foreground uppercase bg-muted/40 border-b border-border">
@@ -264,7 +267,7 @@ export default function CompaniesPage() {
       {/* Glassmorphic Modal */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-0">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

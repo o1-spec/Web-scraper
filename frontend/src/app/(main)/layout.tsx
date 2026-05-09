@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
-import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -57,7 +56,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
-        
+
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-background">
           <div className="lg:pl-64 relative min-h-[calc(100vh-4rem)]">
             <div className="max-w-7xl mx-auto w-full">

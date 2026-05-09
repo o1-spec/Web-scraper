@@ -7,9 +7,10 @@ import { formatDate } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 export default function KeywordsPage() {
-  const { data: keywords, mutate } = useSWR<Keyword[]>('/api/keywords', fetcher, { fallbackData: [] });
+  const { data: keywords, mutate, isLoading } = useSWR<Keyword[]>('/api/keywords', fetcher, { fallbackData: [] });
   const [inputValue, setInputValue] = useState('');
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -106,7 +107,11 @@ export default function KeywordsPage() {
               </h2>
             </div>
 
-            {keywords && keywords.length > 0 ? (
+            {isLoading ? (
+              <div className="p-6">
+                <SkeletonLoader count={5} type="table-row" />
+              </div>
+            ) : keywords && keywords.length > 0 ? (
               <div className="divide-y divide-border flex-1 overflow-y-auto">
                 <AnimatePresence initial={false}>
                   {keywords.map((keyword) => (

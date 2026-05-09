@@ -5,6 +5,7 @@ import { JobFilters as FiltersComponent } from '@/components/jobs/JobFilters';
 import { JobCard } from '@/components/jobs/JobCard';
 import { JobFiltersState as JobFilters } from '@/components/jobs/JobFilters';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 
@@ -26,7 +27,7 @@ export default function JobsPage() {
   if (filters.savedOnly) queryParams.append('savedOnly', 'true');
   if (filters.newOnly) queryParams.append('newOnly', 'true');
 
-  const { data: jobs = [], mutate } = useSWR(`/api/jobs?${queryParams.toString()}`, fetcher);
+  const { data: jobs, mutate, isLoading } = useSWR(`/api/jobs?${queryParams.toString()}`, fetcher);
 
   const handleFiltersChange = (newFilters: JobFilters) => {
     setFilters(newFilters);
@@ -68,7 +69,7 @@ export default function JobsPage() {
           </p>
         </div>
         <div className="text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-          {jobs.length} {jobs.length === 1 ? 'Match' : 'Matches'} Found
+          {isLoading ? '...' : jobs?.length || 0} {jobs?.length === 1 ? 'Match' : 'Matches'} Found
         </div>
       </motion.div>
 
@@ -83,7 +84,9 @@ export default function JobsPage() {
 
       {/* Jobs Grid */}
       <div className="pt-2">
-        {jobs && jobs.length > 0 ? (
+        {isLoading ? (
+          <SkeletonLoader count={4} />
+        ) : jobs && jobs.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
             <AnimatePresence mode="popLayout">
               {jobs.map((job: any, index: number) => (

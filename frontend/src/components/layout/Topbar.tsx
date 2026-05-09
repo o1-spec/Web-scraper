@@ -22,10 +22,10 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const initials = user ? `${user.firstName[0]}${user.lastName[0]}` : 'JD';
 
   return (
-    <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+    <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="flex items-center justify-between px-4 h-16 sm:px-6 lg:px-8">
         {/* Mobile Menu Button */}
-        <button 
+        <button
           onClick={onMenuClick}
           className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
         >
