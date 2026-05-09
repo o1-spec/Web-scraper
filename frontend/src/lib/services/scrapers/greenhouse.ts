@@ -10,7 +10,6 @@ export interface ScrapedJob {
 }
 
 export async function scrapeGreenhouse(url: string, companyName: string): Promise<ScrapedJob[]> {
-  // Extract board token: e.g. https://boards.greenhouse.io/vercel -> vercel
   const match = url.match(/greenhouse\.io\/([^/]+)/);
   if (!match) throw new Error('Invalid Greenhouse URL');
   const boardToken = match[1];
@@ -28,7 +27,7 @@ export async function scrapeGreenhouse(url: string, companyName: string): Promis
       company: companyName,
       location,
       locationType: isRemote ? 'remote' : 'on-site',
-      jobType: 'full-time', // Often not provided reliably in greenhouse basic API
+      jobType: 'full-time',
       source: 'greenhouse',
       jobLink: job.absolute_url,
       description: job.content || '',

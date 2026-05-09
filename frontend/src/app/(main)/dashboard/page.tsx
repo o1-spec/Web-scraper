@@ -31,7 +31,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,7 +42,6 @@ export default function DashboardPage() {
         </p>
       </motion.div>
 
-      {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="Total Jobs"
@@ -84,7 +82,6 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Recent Jobs Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -9,14 +9,10 @@ export function calculateMatchScore(title: string, description: string, userKeyw
 
   for (const keyword of userKeywords) {
     const kw = keyword.toLowerCase();
-    
-    // Check if exact match exists
-    // Basic word boundary regex
     const regex = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     
     if (regex.test(combinedText)) {
       matchedTags.push(keyword);
-      // Give more weight to matches in the title
       if (title.toLowerCase().includes(kw)) {
         score += 20;
       } else {
@@ -25,7 +21,6 @@ export function calculateMatchScore(title: string, description: string, userKeyw
     }
   }
 
-  // Cap score at 100
   const normalizedScore = Math.min(100, Math.max(0, score));
 
   return { score: normalizedScore, tags: matchedTags };

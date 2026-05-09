@@ -1,7 +1,6 @@
 import { ScrapedJob } from './greenhouse';
 
 export async function scrapeLever(url: string, companyName: string): Promise<ScrapedJob[]> {
-  // Extract board token: e.g. https://jobs.lever.co/stripe -> stripe
   const match = url.match(/lever\.co\/([^/]+)/);
   if (!match) throw new Error('Invalid Lever URL');
   const boardToken = match[1];

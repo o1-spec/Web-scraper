@@ -12,7 +12,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: false,
   });
 
-  // Initialize auth state from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -39,10 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // Mock validation
       if (!email || !password) {
         throw new Error('Email and password are required');
       }
@@ -73,10 +70,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Mock validation
       if (!email || !password || !firstName || !lastName) {
         throw new Error('All fields are required');
       }
@@ -120,14 +115,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = useCallback(async (email: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       if (!email) {
         throw new Error('Email is required');
       }
 
-      // Mock success response
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,

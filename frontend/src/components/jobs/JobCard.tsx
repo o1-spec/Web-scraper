@@ -29,15 +29,12 @@ export function JobCard({ job, onSaveToggle, index = 0 }: JobCardProps) {
     >
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5">
         
-        {/* Main Content */}
         <div className="flex-1 min-w-0 flex gap-4 w-full">
-          {/* Company Initial / Logo Placeholder */}
           <div className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 border border-border">
             <span className="text-lg font-bold text-muted-foreground">{job.company.charAt(0)}</span>
           </div>
 
           <div className="flex-1 min-w-0">
-            {/* Title & Company */}
             <div className="flex items-start justify-between gap-3 mb-1.5">
               <div>
                 <h3 className="font-bold text-foreground text-lg leading-tight group-hover:text-primary transition-colors">
@@ -54,7 +51,6 @@ export function JobCard({ job, onSaveToggle, index = 0 }: JobCardProps) {
               </div>
             </div>
 
-            {/* Badges Row */}
             <div className="flex flex-wrap items-center gap-2 mt-3 mb-4">
               <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${getSourceBadgeColor(job.source)}`}>
                 {job.source}
@@ -69,7 +65,6 @@ export function JobCard({ job, onSaveToggle, index = 0 }: JobCardProps) {
               </span>
             </div>
 
-            {/* Tags */}
             <div className="flex flex-wrap gap-1.5">
               {job.tags.slice(0, 5).map((tag) => (
                 <span
@@ -88,7 +83,6 @@ export function JobCard({ job, onSaveToggle, index = 0 }: JobCardProps) {
           </div>
         </div>
 
-        {/* Right Action & Stats Column */}
         <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 sm:gap-0 h-full sm:min-h-[120px]">
           <div className="flex items-center gap-2">
             <button
