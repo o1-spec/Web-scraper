@@ -110,7 +110,7 @@ export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
           >
             <div className="p-5 space-y-5 bg-background">
               {/* Row 1 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                     Company
@@ -123,8 +123,6 @@ export function JobFilters({ onFiltersChange, onReset }: JobFiltersProps) {
                     className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
                   />
                 </div>
-
-
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">

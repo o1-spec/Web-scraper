@@ -51,9 +51,9 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6"
       >
-        <div>
+        <div className="w-full">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
           <p className="mt-2 text-muted-foreground">
             Welcome back. Here&apos;s a high-level overview of your job intelligence tracking.
@@ -62,14 +62,14 @@ export default function DashboardPage() {
         <button
           onClick={handleGlobalRefresh}
           disabled={isRefreshing}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
+          className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
         >
           <Zap className={`h-4 w-4 ${isRefreshing ? 'animate-pulse' : ''}`} />
           {isRefreshing ? 'Scanning...' : 'Scan All Sources'}
         </button>
       </motion.div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="Total Jobs"
           value={mockStats.totalJobs}
@@ -123,7 +123,51 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-border">
+          {recentJobs && recentJobs.length > 0 ? (
+            recentJobs.map((job: any) => (
+              <div key={job.id} className="p-4 space-y-3 bg-card hover:bg-muted/30 transition-colors">
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-sm text-foreground truncate">{job.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
+                      <Building2 className="h-3 w-3" />
+                      {job.company}
+                    </p>
+                  </div>
+                  <div className={`flex-shrink-0 px-2 py-0.5 rounded text-[10px] font-bold ${
+                    job.matchScore >= 90 ? 'bg-emerald-500/10 text-emerald-500' :
+                    job.matchScore >= 70 ? 'bg-blue-500/10 text-blue-500' :
+                    'bg-zinc-500/10 text-zinc-400'
+                  }`}>
+                    {job.matchScore}%
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    {getRelativeTime(job.dateFound)}
+                  </div>
+                  <Link 
+                    href={job.jobLink || '#'} 
+                    target="_blank" 
+                    className="text-[10px] font-bold text-blue-500 uppercase tracking-wider hover:underline"
+                  >
+                    Details
+                  </Link>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="p-8 text-center text-sm text-muted-foreground italic">
+              {recentJobs ? 'No recent jobs found.' : 'Loading...'}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-xs text-muted-foreground uppercase bg-muted/40 border-b border-border">
               <tr>

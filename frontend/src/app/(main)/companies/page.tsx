@@ -105,9 +105,9 @@ export default function CompaniesPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+        className="flex flex-col lg:flex-row lg:items-end justify-between gap-6"
       >
-        <div>
+        <div className="w-full">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Tracked Companies</h1>
           <p className="mt-2 text-muted-foreground">
             Manage the career pages and sources you are currently monitoring.
@@ -115,7 +115,7 @@ export default function CompaniesPage() {
         </div>
         <button
           onClick={handleAddClick}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-medium shadow-sm hover:shadow active:scale-[0.98]"
+          className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-medium shadow-sm hover:shadow active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
           Add Company

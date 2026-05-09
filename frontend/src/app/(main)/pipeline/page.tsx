@@ -65,20 +65,24 @@ export default function PipelinePage() {
         </p>
       </motion.div>
 
-      <div className="flex-1 flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
-        {COLUMNS.map((col) => (
-          <div key={col.id} className="flex-shrink-0 w-80 flex flex-col bg-muted/30 rounded-2xl border border-border/50">
-            <div className="p-4 border-b border-border/50 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={`p-1.5 rounded-lg ${col.bg} ${col.color}`}>
-                  <col.icon className="h-4 w-4" />
+      <div className="flex-1 overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none lg:hidden" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none lg:hidden" />
+        
+        <div className="flex gap-6 overflow-x-auto pb-6 h-full custom-scrollbar px-2">
+          {COLUMNS.map((col) => (
+            <div key={col.id} className="flex-shrink-0 w-[280px] sm:w-80 flex flex-col bg-muted/30 rounded-2xl border border-border/50">
+              <div className="p-4 border-b border-border/50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`p-1.5 rounded-lg ${col.bg} ${col.color}`}>
+                    <col.icon className="h-4 w-4" />
+                  </div>
+                  <h2 className="font-bold text-sm tracking-tight whitespace-nowrap">{col.title}</h2>
                 </div>
-                <h2 className="font-bold text-sm tracking-tight">{col.title}</h2>
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-background border border-border text-muted-foreground ml-2">
+                  {getJobsByStatus(col.id).length}
+                </span>
               </div>
-              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-background border border-border text-muted-foreground">
-                {getJobsByStatus(col.id).length}
-              </span>
-            </div>
 
             <div className="flex-1 p-3 space-y-3 overflow-y-auto min-h-[500px]">
               <AnimatePresence mode="popLayout">
@@ -149,6 +153,7 @@ export default function PipelinePage() {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

@@ -63,15 +63,20 @@ export default function JobsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+        className="flex flex-col lg:flex-row lg:items-end justify-between gap-4"
       >
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Discovered Jobs</h1>
-          <p className="mt-2 text-muted-foreground">
+        <div className="w-full">
+          <div className="flex items-center justify-between lg:justify-start lg:gap-4 mb-2 lg:mb-0">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Discovered Jobs</h1>
+            <div className="lg:hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              {isLoading ? '...' : jobs?.length || 0} Found
+            </div>
+          </div>
+          <p className="text-muted-foreground">
             Browse and manage your filtered job opportunities.
           </p>
         </div>
-        <div className="text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+        <div className="hidden lg:block text-sm font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap">
           {isLoading ? '...' : jobs?.length || 0} {jobs?.length === 1 ? 'Match' : 'Matches'} Found
         </div>
       </motion.div>

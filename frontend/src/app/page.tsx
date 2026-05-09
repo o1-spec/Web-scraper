@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/providers/AuthProvider';
 import { 
   Search, 
@@ -38,6 +39,8 @@ export default function LandingPage() {
     },
   ];
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white selection:bg-blue-500/30 overflow-x-hidden">
       {/* Background Noise & Gradients */}
@@ -49,19 +52,19 @@ export default function LandingPage() {
       <nav className="relative z-50 border-b border-white/5 bg-zinc-950/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
                 JS
               </div>
               <span className="text-xl font-bold tracking-tight">JobScout</span>
-            </div>
+            </Link>
 
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Features</a>
               <a href="#how-it-works" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">How it works</a>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               {isLoading ? (
                 <div className="h-10 w-24 bg-white/5 rounded-lg animate-pulse" />
               ) : isAuthenticated ? (
@@ -93,8 +96,62 @@ export default function LandingPage() {
                 </>
               )}
             </div>
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden p-2 text-zinc-400 hover:text-white"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-white/5 bg-zinc-950 px-4 py-6 space-y-4"
+            >
+              <a href="#features" onClick={() => setIsMenuOpen(false)} className="block text-lg font-medium text-zinc-400 hover:text-white">Features</a>
+              <a href="#how-it-works" onClick={() => setIsMenuOpen(false)} className="block text-lg font-medium text-zinc-400 hover:text-white">How it works</a>
+              <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
+                {isAuthenticated ? (
+                  <Link
+                    href="/dashboard"
+                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-black rounded-full text-sm font-bold"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/5 border border-white/10 text-white rounded-full text-sm font-bold"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-full text-sm font-bold"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
@@ -117,7 +174,7 @@ export default function LandingPage() {
               JobScout monitors company career pages 24/7, scrapes new openings, and matches them against your skills with intelligent scoring.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-0">
               <Link
                 href={isAuthenticated ? "/dashboard" : "/signup"}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-full text-lg font-bold hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]"
