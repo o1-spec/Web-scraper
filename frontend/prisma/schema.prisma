@@ -20,6 +20,20 @@ model User {
   keywords       Keyword[]
   savedJobs      SavedJob[]
   digestSettings DigestSettings?
+  notifications  Notification[]
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // "JOB_FOUND", "SCRAPE_SUCCESS", "SCRAPE_ERROR"
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Company {

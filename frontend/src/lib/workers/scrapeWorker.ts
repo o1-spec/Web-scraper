@@ -91,6 +91,18 @@ export const worker = new Worker('scrapeCompany', async (job: Job) => {
       }
     });
 
+    if (newJobsInserted > 0) {
+      await prisma.notification.create({
+        data: {
+          userId: company.userId,
+          title: 'New Jobs Discovered',
+          message: `Found ${newJobsInserted} new jobs for ${company.name} matching your profile.`,
+          type: 'JOB_FOUND',
+          link: '/jobs'
+        }
+      });
+    }
+
     console.log(`[ScrapeWorker] Completed company ${companyId}. Inserted ${newJobsInserted} new jobs.`);
   } catch (error: any) {
     console.error(`[ScrapeWorker] Error scraping company ${companyId}:`, error);
@@ -108,6 +120,19 @@ export const worker = new Worker('scrapeCompany', async (job: Job) => {
       where: { id: companyId },
       data: { status: 'error' }
     });
+
+    const companyName = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true, userId: true } });
+    if (companyName) {
+      await prisma.notification.create({
+        data: {
+          userId: companyName.userId,
+          title: 'Scrape Failed',
+          message: `Failed to scrape ${companyName.name}: ${error.message || 'Unknown error'}`,
+          type: 'SCRAPE_ERROR',
+          link: '/status'
+        }
+      });
+    }
   }
 }, { connection: redis });
 

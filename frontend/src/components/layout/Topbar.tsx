@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, Menu, LogOut, Settings, ChevronDown } from 'lucide-react';
+import useSWR from 'swr';
+import { fetcher } from '@/lib/fetcher';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +30,9 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
   const initials = user ? `${user.firstName[0]}${user.lastName[0]}` : 'JD';
 
+  const { data: notifications } = useSWR('/api/notifications', fetcher);
+  const hasUnread = notifications?.some((n: any) => !n.isRead);
+
   return (
     <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="flex items-center justify-between px-4 h-16 sm:px-6 lg:px-8">
@@ -41,10 +47,12 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         {/* Right Section */}
         <div className="flex items-center gap-3 ml-auto">
           {/* Notifications */}
-          <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors group">
+          <Link href="/notifications" className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors group">
             <Bell className="h-4 w-4 transition-transform group-hover:scale-110" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-blue-500 rounded-full border-2 border-background" />
-          </button>
+            {hasUnread && (
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-blue-500 rounded-full border-2 border-background animate-pulse" />
+            )}
+          </Link>
 
           {/* Divider */}
           <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
