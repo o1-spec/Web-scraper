@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Activity,
+  Send,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
@@ -36,6 +37,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Jobs', href: '/jobs', icon: Briefcase },
+    { name: 'Pipeline', href: '/pipeline', icon: Send },
     { name: 'Companies', href: '/companies', icon: Building2 },
     { name: 'Keywords', href: '/keywords', icon: Tag },
     { name: 'Status', href: '/status', icon: Activity },

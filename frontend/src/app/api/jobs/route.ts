@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
     const savedOnly = searchParams.get('savedOnly') === 'true';
     const newOnly = searchParams.get('newOnly') === 'true';
 
-    // Get the companies the user tracks
     const companyIds = (await prisma.company.findMany({
       where: { userId: payload.userId },
       select: { id: true }

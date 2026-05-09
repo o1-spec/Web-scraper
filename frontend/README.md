@@ -1,235 +1,84 @@
-# JobScout Frontend
+# 🚀 JobScout: Engineering Career Intelligence
 
-A modern, clean job monitoring dashboard built with Next.js, TypeScript, and Tailwind CSS.
+**JobScout** is a premium, full-stack job discovery engine and career CRM designed to automate the search for high-signal engineering roles. It monitors company career pages in real-time, scores roles against your technical profile, and manages your entire application journey in one unified dashboard.
 
-## Features
-
-✨ **Dashboard** - Overview of your job tracking metrics
-📋 **Job Listings** - Browse and filter jobs from multiple sources
-🏢 **Company Tracking** - Manage career pages you're monitoring
-🔑 **Keywords** - Track specific roles, technologies, and levels
-⚙️ **Settings** - Configure email digest preferences
-
-## Tech Stack
-
-- **Framework**: Next.js 14
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **UI Components**: shadcn/ui (ready to integrate)
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
-```bash
-# Navigate to the frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-# or
-yarn install
-
-# Create environment file
-cp .env.example .env.local
-```
-
-### Development
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
-
-```
-src/
-├── app/                      # Next.js pages and layouts
-│   ├── dashboard/           # Dashboard page
-│   ├── jobs/                # Jobs listing page
-│   ├── companies/           # Companies tracking page
-│   ├── keywords/            # Keywords preferences page
-│   ├── settings/            # Settings page
-│   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Root redirect
-│   └── globals.css          # Global styles
-├── components/
-│   ├── layout/
-│   │   ├── Sidebar.tsx      # Main navigation
-│   │   └── Topbar.tsx       # Top navigation bar
-│   ├── dashboard/
-│   │   └── StatCard.tsx     # Statistics cards
-│   ├── jobs/
-│   │   ├── JobCard.tsx      # Job listing card
-│   │   └── JobFilters.tsx   # Job filtering component
-│   └── companies/
-│       └── CompanyTable.tsx # Companies table (upcoming)
-├── lib/
-│   ├── mockData.ts          # Mock data for development
-│   └── utils.ts             # Utility functions
-├── types/
-│   └── index.ts             # TypeScript type definitions
-└── styles/                  # Additional style files
-
-```
-
-## Key Components
-
-### StatCard
-Displays key metrics like total jobs, new jobs today, etc.
-
-```tsx
-<StatCard
-  label="Total Jobs"
-  value={42}
-  icon={Briefcase}
-  trend={{ value: 12, isPositive: true }}
-/>
-```
-
-### JobCard
-Shows individual job listing with save functionality.
-
-```tsx
-<JobCard
-  job={jobData}
-  onSaveToggle={handleSave}
-/>
-```
-
-### JobFilters
-Advanced filtering for job search.
-
-```tsx
-<JobFilters
-  onFiltersChange={handleFilters}
-  onReset={handleReset}
-/>
-```
-
-## Available Routes
-
-- `/` - Redirects to `/dashboard`
-- `/dashboard` - Main dashboard overview
-- `/jobs` - Jobs listing with filters
-- `/companies` - Company tracking management
-- `/keywords` - Keyword preferences
-- `/settings` - Email digest and preferences
-
-## Mock Data
-
-The application comes with realistic mock data:
-- 10 sample jobs
-- 9 sample companies
-- 11 sample keywords
-- Dashboard statistics
-
-Mock data is located in `src/lib/mockData.ts` and can be easily replaced with API calls to the backend.
-
-## Types
-
-All TypeScript types are defined in `src/types/index.ts`:
-
-- `Job` - Job posting interface
-- `Company` - Company information
-- `Keyword` - Keyword tracking
-- `DigestSettings` - Email digest configuration
-- `DashboardStats` - Dashboard metrics
-
-## Styling
-
-The project uses Tailwind CSS with a custom color scheme. Key features:
-
-- **Color Variables**: Defined in `tailwind.config.ts`
-- **Responsive Design**: Mobile-first approach with breakpoints
-- **Custom Components**: Reusable component patterns
-- **Light Theme**: Clean white/light gray design
-
-## Environment Variables
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
-```
-
-## Backend Integration
-
-Currently, the frontend uses mock data. To connect to the backend:
-
-1. Create API client functions in `lib/api.ts`
-2. Replace mock data imports with API calls
-3. Update `.env.local` with backend URL
-
-Example pattern:
-
-```tsx
-// Before: Using mock data
-import { mockJobs } from '@/lib/mockData';
-const [jobs, setJobs] = useState<Job[]>(mockJobs);
-
-// After: Using API
-const [jobs, setJobs] = useState<Job[]>([]);
-useEffect(() => {
-  fetchJobs().then(setJobs);
-}, []);
-```
-
-## Scripts
-
-```bash
-npm run dev       # Start development server
-npm run build     # Build for production
-npm start         # Start production server
-npm run lint      # Run ESLint
-```
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers
-
-## Performance
-
-- Optimized with Next.js Image component
-- CSS modules for scoped styling
-- Efficient state management with React hooks
-- Client-side filtering for smooth UX
-
-## Accessibility
-
-- Semantic HTML
-- ARIA labels where needed
-- Keyboard navigation support
-- Color contrast compliance
-
-## Future Enhancements
-
-- [ ] Dark mode support
-- [ ] Advanced analytics
-- [ ] Job recommendations
-- [ ] Saved searches
-- [ ] Export functionality
-- [ ] Team collaboration features
-
-## Contributing
-
-This is a personal project. Feel free to fork and customize for your needs.
-
-## License
-
-MIT
+![JobScout Banner](https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=2000&ixlib=rb-4.0.3)
 
 ---
 
-**JobScout** - Personal job monitoring dashboard for tracking roles across company career pages.
+## ✨ High-End Features
+
+- **Multi-Engine Scraper**: Native adapters for **Greenhouse, Lever, Ashby, Breezy HR, and Workable**.
+- **Match Intelligence**: Proprietary keyword-weighted algorithm that calculates a % match for every role discovered.
+- **Automated Career CRM**: A full Kanban-style board to track applications from *Saved* to *Offer*.
+- **Daily Intelligence Reports**: Personalized HTML email digests delivered to your inbox via Nodemailer.
+- **Global Discovery**: Single-click "Global Scrape" to refresh your entire tracking ecosystem.
+- **Observability**: Real-time system monitoring of scraper health and queue performance.
+
+## 🏗️ Technical Architecture
+
+This project is built with a focus on **scalability, performance, and clean code**.
+
+- **Frontend**: Next.js 14 (App Router), Tailwind CSS, Framer Motion.
+- **Backend**: Next.js API Routes, BullMQ, Redis.
+- **Database**: PostgreSQL with Prisma ORM.
+- **Infrastructure**: Distributed Background Workers.
+
+For a deep dive into the system design, see [**ARCHITECTURE.md**](./ARCHITECTURE.md).
+
+---
+
+## 🚦 Getting Started
+
+### 1. Prerequisites
+- **PostgreSQL**: Primary data store.
+- **Redis**: Required for BullMQ task queues.
+- **Node.js**: v18+.
+
+### 2. Installation
+```bash
+git clone https://github.com/yourusername/jobscout.git
+cd jobscout/frontend
+npm install
+```
+
+### 3. Environment Setup
+Create a `.env` file based on `.env.example`:
+```env
+DATABASE_URL="postgresql://..."
+REDIS_URL="redis://..."
+JWT_SECRET="your-secret"
+SMTP_HOST="smtp.example.com"
+EMAIL_FROM="JobScout <noreply@jobscout.com>"
+```
+
+### 4. Database & Workers
+```bash
+# Apply migrations
+npx prisma migrate dev
+
+# Start the discovery workers (in a separate terminal)
+npm run worker
+
+# Start the application
+npm run dev
+```
+
+---
+
+## 📊 Business Logic: The Scoring Engine
+JobScout doesn't just find jobs; it evaluates them. The engine analyzes:
+1. **Title Weighting**: Matches in the job title carry the highest signal.
+2. **Contextual Analysis**: Tags are extracted from the job description to identify tech stacks (React, Go, AWS).
+3. **Thresholding**: Only roles meeting your `minimumMatchScore` are enqueued for your daily digest.
+
+---
+
+## 🎨 Design Philosophy
+JobScout uses a **Glassmorphic / Modern Dark** aesthetic:
+- **Responsive**: Fully optimized for mobile discovery.
+- **Accessible**: Semantic HTML and ARIA-compliant components.
+- **Premium**: Smooth micro-animations using `framer-motion`.
+
+## 📜 License
+MIT - Created by [Your Name]

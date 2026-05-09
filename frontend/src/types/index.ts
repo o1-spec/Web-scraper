@@ -58,3 +58,15 @@ export interface DashboardStats {
   savedJobs: number;
   lastScrapeTime: Date;
 }
+
+export type JobStatus = 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED';
+
+export interface SavedJob {
+  id: string;
+  userId: string;
+  jobId: string;
+  status: JobStatus;
+  savedAt: Date;
+  updatedAt: Date;
+  job: Job & { company: { name: string } };
+}

@@ -5,21 +5,37 @@ import {
   Briefcase,
   Building2,
   ArrowRight,
-
   Bookmark,
-
   Clock,
   TrendingUp,
+  Zap
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { formatDateTime, getRelativeTime } from '@/lib/utils';
 import Link from 'next/link';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function DashboardPage() {
   const { data: stats } = useSWR('/api/dashboard/stats', fetcher);
   const { data: recentJobs } = useSWR('/api/dashboard/recent-jobs', fetcher);
+  const { addToast } = useToast();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleGlobalRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await fetch('/api/status/global-refresh', { method: 'POST' });
+      if (!response.ok) throw new Error('Failed to start refresh');
+      addToast('Global refresh started! Monitoring all sources.', 'success');
+    } catch (err) {
+      addToast('Failed to start global refresh.', 'error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const mockStats = stats || {
     totalJobs: 0,
@@ -35,11 +51,22 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
       >
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">
-          Welcome back. Here&apos;s a high-level overview of your job intelligence tracking.
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <p className="mt-2 text-muted-foreground">
+            Welcome back. Here&apos;s a high-level overview of your job intelligence tracking.
+          </p>
+        </div>
+        <button
+          onClick={handleGlobalRefresh}
+          disabled={isRefreshing}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:scale-100"
+        >
+          <Zap className={`h-4 w-4 ${isRefreshing ? 'animate-pulse' : ''}`} />
+          {isRefreshing ? 'Scanning...' : 'Scan All Sources'}
+        </button>
       </motion.div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">

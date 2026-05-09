@@ -15,7 +15,6 @@ export async function POST(
     if (!company) return NextResponse.json({ error: 'Company not found' }, { status: 404 });
     if (company.userId !== payload.userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // Create a ScrapeRun record
     const scrapeRun = await prisma.scrapeRun.create({
       data: {
         companyId: company.id,
@@ -23,7 +22,6 @@ export async function POST(
       }
     });
 
-    // Enqueue the job in BullMQ
     await enqueueScrapeJob(company.id, scrapeRun.id);
 
     return NextResponse.json({ success: true, runId: scrapeRun.id, message: 'Scraping job queued.' });

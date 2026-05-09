@@ -63,7 +63,9 @@ model SavedJob {
   id        String   @id @default(uuid())
   userId    String
   jobId     String
+  status    String   @default("SAVED") // "SAVED", "APPLIED", "INTERVIEWING", "OFFER", "REJECTED"
   savedAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
