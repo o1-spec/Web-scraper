@@ -13,6 +13,7 @@ import {
   Send,
   Bookmark,
   Bell,
+  Search,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
@@ -38,6 +39,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Discovery', href: '/discovery', icon: Search },
     { name: 'Jobs', href: '/jobs', icon: Briefcase },
     { name: 'Bookmarks', href: '/bookmarks', icon: Bookmark },
     { name: 'Notifications', href: '/notifications', icon: Bell },
