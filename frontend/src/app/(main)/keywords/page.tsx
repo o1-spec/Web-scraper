@@ -8,9 +8,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function KeywordsPage() {
   const { data: keywords, mutate, isLoading } = useSWR<Keyword[]>('/api/keywords', fetcher, { fallbackData: [] });
+  const { addToast } = useToast();
   const [inputValue, setInputValue] = useState('');
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -22,10 +24,11 @@ export default function KeywordsPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ keyword: inputValue.trim() }),
         });
+        addToast('Keyword added', 'success');
         mutate();
         setInputValue('');
       } catch (err) {
-        alert('Failed to add keyword');
+        addToast('Failed to add keyword', 'error');
       }
     }
   };
@@ -33,9 +36,10 @@ export default function KeywordsPage() {
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/keywords/${id}`, { method: 'DELETE' });
+      addToast('Keyword removed', 'success');
       mutate();
     } catch (err) {
-      alert('Failed to delete keyword');
+      addToast('Failed to delete keyword', 'error');
     }
   };
 

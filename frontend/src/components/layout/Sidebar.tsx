@@ -12,8 +12,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,6 +27,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const router = useRouter();
   const { logout } = useAuth();
   const { addToast } = useToast();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
   if (isAuthPage) return null;
@@ -37,10 +40,14 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
-  const handleLogout = () => {
-    logout();
-    addToast('Logged out successfully', 'success');
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      addToast('Logged out successfully', 'success');
+      router.push('/login');
+    } catch (error) {
+      addToast('Failed to logout', 'error');
+    }
   };
 
   const SidebarContent = (
@@ -100,13 +107,23 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       {/* Footer */}
       <div className="border-t border-white/5 p-4 relative z-10">
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutModal(true)}
           className="group flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200"
         >
           <LogOut className="h-4 w-4 text-zinc-500 group-hover:text-red-400 transition-colors" />
           <span className="group-hover:text-red-400 transition-colors">Logout</span>
         </button>
       </div>
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+        title="Confirm Logout"
+        message="Are you sure you want to log out of JobScout? You will need to sign in again to access your dashboard."
+        confirmText="Sign Out"
+        type="danger"
+      />
     </div>
   );
 

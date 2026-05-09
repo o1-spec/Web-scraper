@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { Bell, Mail, Clock, Shield, Key, Webhook, Check } from 'lucide-react';
+import { Bell, Mail, Clock, Shield, Key, Webhook } from 'lucide-react';
 import { DigestSettings } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function SettingsPage() {
   const { data: serverSettings, mutate, isLoading } = useSWR<DigestSettings>('/api/settings', fetcher);
+  const { addToast } = useToast();
   const [settings, setSettings] = useState<DigestSettings | null>(null);
-  const [saved, setSaved] = useState(false);
 
   // Sync server data to local state when it loads
   if (serverSettings && !settings) {
@@ -21,7 +22,6 @@ export default function SettingsPage() {
   const handleChange = (key: keyof DigestSettings, value: any) => {
     if (!settings) return;
     setSettings({ ...settings, [key]: value });
-    setSaved(false);
   };
 
   const handleSave = async () => {
@@ -33,10 +33,9 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
       mutate();
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      addToast('Preferences saved successfully', 'success');
     } catch (err) {
-      alert('Failed to save settings');
+      addToast('Failed to save settings', 'error');
     }
   };
 
@@ -208,21 +207,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Footer / Actions */}
-            <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
-              <AnimatePresence>
-                {saved && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-medium"
-                  >
-                    <Check className="h-4 w-4" />
-                    Saved
-                  </motion.div>
-                )}
-                {!saved && <div />}
-              </AnimatePresence>
+            <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-end">
               <button
                 onClick={handleSave}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-medium shadow-sm text-sm"

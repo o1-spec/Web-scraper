@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { Portal } from '@/components/Portal';
+import { useToast } from '@/providers/ToastProvider';
 
 interface FormData {
   name: string;
@@ -17,6 +19,7 @@ interface FormData {
 
 export default function CompaniesPage() {
   const { data: companies, mutate, isLoading } = useSWR<Company[]>('/api/companies', fetcher, { fallbackData: [] });
+  const { addToast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +47,7 @@ export default function CompaniesPage() {
 
   const handleSave = async () => {
     if (!formData.name || !formData.careerPageUrl) {
-      alert('Please fill in all fields');
+      addToast('Please fill in all fields', 'error');
       return;
     }
 
@@ -55,35 +58,41 @@ export default function CompaniesPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
+        addToast('Company updated successfully', 'success');
       } else {
         await fetch('/api/companies', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
+        addToast('Company added successfully', 'success');
       }
       mutate();
       setShowModal(false);
     } catch (error) {
-      console.error(error);
-      alert('Failed to save company');
+      addToast('Failed to save company', 'error');
     }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this company?')) {
-      await fetch(`/api/companies/${id}`, { method: 'DELETE' });
-      mutate();
+      try {
+        await fetch(`/api/companies/${id}`, { method: 'DELETE' });
+        addToast('Company deleted', 'success');
+        mutate();
+      } catch (err) {
+        addToast('Failed to delete company', 'error');
+      }
     }
   };
 
   const handleRefresh = async (id: string) => {
     try {
       await fetch(`/api/companies/${id}/refresh`, { method: 'POST' });
-      alert('Scraping job queued!');
+      addToast('Scraping job queued!', 'success');
       mutate();
     } catch (e) {
-      alert('Failed to refresh');
+      addToast('Failed to refresh', 'error');
     }
   };
 
@@ -265,99 +274,101 @@ export default function CompaniesPage() {
       </motion.div>
 
       {/* Glassmorphic Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-0">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-              onClick={() => setShowModal(false)}
-            />
+      <Portal>
+        <AnimatePresence>
+          {showModal && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-0">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                onClick={() => setShowModal(false)}
+              />
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2, type: "spring", bounce: 0 }}
-              className="relative w-full max-w-md bg-card border border-border shadow-2xl rounded-2xl overflow-hidden"
-            >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/20">
-                <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                  {editingId ? 'Edit Tracker' : 'New Company Tracker'}
-                </h2>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g., Stripe"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Careers Page URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.careerPageUrl}
-                    onChange={(e) => setFormData({ ...formData, careerPageUrl: e.target.value })}
-                    placeholder="https://company.com/careers"
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Source Integration
-                  </label>
-                  <select
-                    value={formData.sourceType}
-                    onChange={(e) => setFormData({ ...formData, sourceType: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm appearance-none cursor-pointer"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.2, type: "spring", bounce: 0 }}
+                className="relative w-full max-w-md bg-card border border-border shadow-2xl rounded-2xl overflow-hidden"
+              >
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/20">
+                  <h2 className="text-lg font-semibold tracking-tight text-foreground">
+                    {editingId ? 'Edit Tracker' : 'New Company Tracker'}
+                  </h2>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors"
                   >
-                    <option value="greenhouse">Greenhouse ATS</option>
-                    <option value="lever">Lever ATS</option>
-                    <option value="ashby">Ashby ATS</option>
-                    <option value="custom">Custom Web Scraper</option>
-                  </select>
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
-              </div>
 
-              <div className="flex gap-3 px-6 py-4 bg-muted/20 border-t border-border">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2 border border-input bg-background rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors font-medium text-sm shadow-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm shadow-sm"
-                >
-                  {editingId ? 'Save Changes' : 'Create Tracker'}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+                <div className="p-6 space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                      Company Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g., Stripe"
+                      className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                      Careers Page URL
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.careerPageUrl}
+                      onChange={(e) => setFormData({ ...formData, careerPageUrl: e.target.value })}
+                      placeholder="https://company.com/careers"
+                      className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                      Source Integration
+                    </label>
+                    <select
+                      value={formData.sourceType}
+                      onChange={(e) => setFormData({ ...formData, sourceType: e.target.value as any })}
+                      className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm appearance-none cursor-pointer"
+                    >
+                      <option value="greenhouse">Greenhouse ATS</option>
+                      <option value="lever">Lever ATS</option>
+                      <option value="ashby">Ashby ATS</option>
+                      <option value="custom">Custom Web Scraper</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 px-6 py-4 bg-muted/20 border-t border-border">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="flex-1 px-4 py-2 border border-input bg-background rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors font-medium text-sm shadow-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm shadow-sm"
+                  >
+                    {editingId ? 'Save Changes' : 'Create Tracker'}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </Portal>
     </div>
   );
 }

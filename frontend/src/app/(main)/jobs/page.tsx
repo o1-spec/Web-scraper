@@ -6,10 +6,12 @@ import { JobCard } from '@/components/jobs/JobCard';
 import { JobFiltersState as JobFilters } from '@/components/jobs/JobFilters';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { useToast } from '@/providers/ToastProvider';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 
 export default function JobsPage() {
+  const { addToast } = useToast();
   const [filters, setFilters] = useState<JobFilters>({
     keyword: '',
     company: 'all',
@@ -47,9 +49,10 @@ export default function JobsPage() {
   const handleToggleSave = async (jobId: string) => {
     try {
       await fetch(`/api/jobs/${jobId}/save`, { method: 'POST' });
+      addToast('Saved status updated', 'success');
       mutate();
     } catch(err) {
-      console.error(err);
+      addToast('Failed to update save status', 'error');
     }
   };
 
