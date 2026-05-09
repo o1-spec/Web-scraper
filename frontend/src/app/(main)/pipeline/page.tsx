@@ -4,16 +4,19 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Bookmark, 
-  Send, 
-  Users, 
-  CheckCircle, 
+import {
+  Bookmark,
+  Send,
+  Users,
+  CheckCircle,
   XCircle,
   Building2,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Clock,
+  FileText,
 } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 import { useToast } from '@/providers/ToastProvider';
 
 const COLUMNS = [
@@ -39,13 +42,26 @@ export default function PipelinePage() {
       });
 
       if (!res.ok) throw new Error();
-      
+
       addToast(`Status updated to ${newStatus.toLowerCase()}`, 'success');
       mutate();
     } catch (err) {
       addToast('Failed to update status', 'error');
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleNotesChange = async (savedJobId: string, notes: string) => {
+    try {
+      await fetch(`/api/jobs/saved/${savedJobId}/notes`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes }),
+      });
+      mutate();
+    } catch (err) {
+      addToast('Failed to save notes', 'error');
     }
   };
 
@@ -68,7 +84,7 @@ export default function PipelinePage() {
       <div className="flex-1 overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none lg:hidden" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none lg:hidden" />
-        
+
         <div className="flex gap-6 overflow-x-auto pb-6 h-full custom-scrollbar px-2">
           {COLUMNS.map((col) => (
             <div key={col.id} className="flex-shrink-0 w-[280px] sm:w-80 flex flex-col bg-muted/30 rounded-2xl border border-border/50">
@@ -84,75 +100,91 @@ export default function PipelinePage() {
                 </span>
               </div>
 
-            <div className="flex-1 p-3 space-y-3 overflow-y-auto min-h-[500px]">
-              <AnimatePresence mode="popLayout">
-                {getJobsByStatus(col.id).map((sj: any, index: number) => (
-                  <motion.div
-                    key={sj.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                    className="group bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-default relative"
-                  >
-                    <div className="flex flex-col gap-3">
-                      <div>
-                        <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                          {sj.job.title}
-                        </h3>
-                        <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
-                          <Building2 className="h-3 w-3" />
-                          <span className="font-medium">{sj.job.company.name}</span>
+              <div className="flex-1 p-3 space-y-3 overflow-y-auto min-h-[500px]">
+                <AnimatePresence mode="popLayout">
+                  {getJobsByStatus(col.id).map((sj: any, index: number) => (
+                    <motion.div
+                      key={sj.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      className="group bg-card border border-border rounded-xl p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-default relative"
+                    >
+                      <div className="flex flex-col gap-3">
+                        <div>
+                          <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                            {sj.job.title}
+                          </h3>
+                          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                            <Building2 className="h-3 w-3" />
+                            <span className="font-medium">{sj.job.company.name}</span>
+                          </div>
+                          {sj.appliedAt && (
+                            <div className="flex items-center gap-1.5 mt-2 text-[10px] font-bold text-blue-500/80 uppercase tracking-tight">
+                              <Clock className="h-3 w-3" />
+                              <span>Applied {formatDate(sj.appliedAt)}</span>
+                            </div>
+                          )}
+
+                          <div className="mt-3 relative group/notes">
+                            <textarea
+                              defaultValue={sj.notes || ''}
+                              placeholder="Add notes..."
+                              onBlur={(e) => handleNotesChange(sj.id, e.target.value)}
+                              className="w-full bg-muted/50 border border-transparent focus:border-primary/20 focus:bg-background rounded-lg p-2 text-xs text-muted-foreground focus:text-foreground outline-none transition-all resize-none min-h-[60px] custom-scrollbar"
+                            />
+                            <FileText className="absolute right-2 top-2 h-3 w-3 text-muted-foreground/30 group-focus-within/notes:text-primary transition-colors" />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-border/50 mt-1">
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={sj.job.jobLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-primary transition-all"
+                              title="View Posting"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            {COLUMNS.filter(c => c.id !== col.id).map(c => (
+                              <button
+                                key={c.id}
+                                onClick={() => handleStatusChange(sj.id, c.id)}
+                                disabled={updatingId === sj.id}
+                                className={`p-1.5 rounded-md hover:${c.bg} hover:${c.color} text-muted-foreground/30 transition-all`}
+                                title={`Move to ${c.title}`}
+                              >
+                                <ChevronRight className="h-3.5 w-3.5" />
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-border/50 mt-1">
-                        <div className="flex items-center gap-2">
-                          <a 
-                            href={sj.job.jobLink} 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-primary transition-all"
-                            title="View Posting"
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
+                      {updatingId === sj.id && (
+                        <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center rounded-xl">
+                          <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         </div>
-                        
-                        <div className="flex items-center gap-1">
-                           {COLUMNS.filter(c => c.id !== col.id).map(c => (
-                             <button
-                               key={c.id}
-                               onClick={() => handleStatusChange(sj.id, c.id)}
-                               disabled={updatingId === sj.id}
-                               className={`p-1.5 rounded-md hover:${c.bg} hover:${c.color} text-muted-foreground/30 transition-all`}
-                               title={`Move to ${c.title}`}
-                             >
-                               <ChevronRight className="h-3.5 w-3.5" />
-                             </button>
-                           ))}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {updatingId === sj.id && (
-                      <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center rounded-xl">
-                        <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              
-              {getJobsByStatus(col.id).length === 0 && (
-                <div className="h-32 border-2 border-dashed border-border/50 rounded-xl flex items-center justify-center p-4 text-center">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/40">Empty</p>
-                </div>
-              )}
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {getJobsByStatus(col.id).length === 0 && (
+                  <div className="h-32 border-2 border-dashed border-border/50 rounded-xl flex items-center justify-center p-4 text-center">
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground/40">Empty</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
     </div>

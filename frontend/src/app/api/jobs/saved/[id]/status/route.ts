@@ -28,12 +28,18 @@ export async function PATCH(
       return NextResponse.json({ error: 'Job not found or unauthorized' }, { status: 404 });
     }
 
+    const updateData: any = { 
+      status: status,
+      updatedAt: new Date()
+    };
+
+    if (status === 'APPLIED' && !existing.appliedAt) {
+      updateData.appliedAt = new Date();
+    }
+
     const updated = await prisma.savedJob.update({
       where: { id: params.id },
-      data: { 
-        status: status,
-        updatedAt: new Date()
-      } as any
+      data: updateData
     });
 
     return NextResponse.json(updated);

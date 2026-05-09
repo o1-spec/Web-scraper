@@ -78,7 +78,9 @@ model SavedJob {
   userId    String
   jobId     String
   status    String   @default("SAVED") // "SAVED", "APPLIED", "INTERVIEWING", "OFFER", "REJECTED"
+  notes     String?  @db.Text
   savedAt   DateTime @default(now())
+  appliedAt DateTime?
   updatedAt DateTime @updatedAt @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
