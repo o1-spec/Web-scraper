@@ -6,7 +6,9 @@ export async function GET(req: NextRequest) {
   try {
     const payload = getUserFromRequest(req);
     if (!payload) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      response.cookies.delete('token');
+      return response;
     }
 
     const user = await prisma.user.findUnique({
@@ -20,7 +22,9 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      const response = NextResponse.json({ error: 'User not found' }, { status: 404 });
+      response.cookies.delete('token');
+      return response;
     }
 
     return NextResponse.json({ user });

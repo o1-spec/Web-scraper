@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
+import { Outfit } from 'next/font/google';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
 import { ToastContainer } from '@/components/Toast';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import './globals.css';
+
+const outfit = Outfit({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
 
 export const metadata: Metadata = {
   title: 'JobScout - Personal Job Monitoring Dashboard',
@@ -20,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
+    <html lang="en" suppressHydrationWarning className={outfit.variable}>
+      <body className={`${outfit.className} bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
           <ToastProvider>
