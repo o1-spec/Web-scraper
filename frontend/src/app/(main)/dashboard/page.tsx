@@ -107,45 +107,61 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {recentJobs ? recentJobs.map((job: any, index: number) => (
-                <motion.tr
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
-                  key={job.id}
-                  className="bg-card hover:bg-muted/30 transition-colors group"
-                >
-                  <td className="px-6 py-4">
-                    <p className="font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{job.title}</p>
+              {recentJobs ? (
+                recentJobs.length > 0 ? (
+                  recentJobs.map((job: any, index: number) => (
+                    <motion.tr
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      key={job.id}
+                      className="bg-card hover:bg-muted/30 transition-colors group"
+                    >
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{job.title}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+                            {job.company.charAt(0)}
+                          </div>
+                          <span className="font-medium text-muted-foreground">{job.company}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 bg-secondary rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-emerald-500 h-1.5 rounded-full"
+                              style={{ width: `${job.matchScore}%` }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold text-foreground font-mono">
+                            {job.matchScore}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-muted-foreground">
+                          {getRelativeTime(job.dateFound)}
+                        </p>
+                      </td>
+                    </motion.tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                      No recent jobs found. Add companies to start tracking.
+                    </td>
+                  </tr>
+                )
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground italic">
+                    Loading recent discoveries...
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                        {job.company.charAt(0)}
-                      </div>
-                      <span className="font-medium text-muted-foreground">{job.company}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 bg-secondary rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="bg-emerald-500 h-1.5 rounded-full"
-                          style={{ width: `${job.matchScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-semibold text-foreground font-mono">
-                        {job.matchScore}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-muted-foreground">
-                      {getRelativeTime(job.dateFound)}
-                    </p>
-                  </td>
-                </motion.tr>
-              )) : <tr><td colSpan={4} className="px-6 py-4 text-center">Loading...</td></tr>}
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

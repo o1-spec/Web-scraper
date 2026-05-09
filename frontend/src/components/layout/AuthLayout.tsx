@@ -95,8 +95,8 @@ export default function AuthLayout({
             © {new Date().getFullYear()} JobScout Inc.
           </p>
           <div className="flex items-center gap-4 text-sm text-zinc-500">
-            <Link href="#" className="hover:text-zinc-300 transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-zinc-300 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-zinc-300 transition-colors">Terms</Link>
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function Topbar() {
+export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -25,7 +25,10 @@ export function Topbar() {
     <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="flex items-center justify-between px-4 h-16 sm:px-6 lg:px-8">
         {/* Mobile Menu Button */}
-        <button className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+        >
           <Menu className="h-5 w-5" />
         </button>
 

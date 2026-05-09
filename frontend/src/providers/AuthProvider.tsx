@@ -13,48 +13,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const checkSession = async () => {
       try {
-        const user = JSON.parse(storedUser);
-        setAuthState({
-          user,
-          isLoading: false,
-          isAuthenticated: true,
-        });
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          setAuthState({
+            user: data.user,
+            isLoading: false,
+            isAuthenticated: true,
+          });
+        } else {
+          setAuthState({
+            user: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
+        }
       } catch (error) {
-        localStorage.removeItem('user');
         setAuthState({
           user: null,
           isLoading: false,
           isAuthenticated: false,
         });
       }
-    } else {
-      setAuthState((prev) => ({ ...prev, isLoading: false }));
-    }
+    };
+
+    checkSession();
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (!email || !password) {
-        throw new Error('Email and password are required');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
       }
 
-      const mockUser: User = {
-        id: '1',
-        email,
-        firstName: 'John',
-        lastName: 'Doe',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-      };
-
-      localStorage.setItem('user', JSON.stringify(mockUser));
       setAuthState({
-        user: mockUser,
+        user: data.user,
         isLoading: false,
         isAuthenticated: true,
       });
@@ -70,27 +74,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
 
-      if (!email || !password || !firstName || !lastName) {
-        throw new Error('All fields are required');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed');
       }
 
-      if (password.length < 6) {
-        throw new Error('Password must be at least 6 characters');
-      }
-
-      const mockUser: User = {
-        id: Date.now().toString(),
-        email,
-        firstName,
-        lastName,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${firstName}`,
-      };
-
-      localStorage.setItem('user', JSON.stringify(mockUser));
       setAuthState({
-        user: mockUser,
+        user: data.user,
         isLoading: false,
         isAuthenticated: true,
       });
@@ -103,22 +100,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('user');
-    setAuthState({
-      user: null,
-      isLoading: false,
-      isAuthenticated: false,
-    });
+  const logout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setAuthState({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+      });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true }));
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-      if (!email) {
-        throw new Error('Email is required');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Reset failed');
       }
 
       setAuthState((prev) => ({

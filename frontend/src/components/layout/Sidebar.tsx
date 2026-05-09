@@ -12,15 +12,20 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
+
+export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useAuth();
   const { addToast } = useToast();
 
-  // Hide sidebar on auth pages
   const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
   if (isAuthPage) return null;
 
@@ -38,9 +43,9 @@ export function Sidebar() {
     router.push('/login');
   };
 
-  return (
-    <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:bg-zinc-950 lg:border-r lg:border-white/10 z-50">
-      {/* Subtle background noise for Sidebar */}
+  const SidebarContent = (
+    <div className="flex flex-col h-full bg-zinc-950 border-r border-white/10 relative overflow-hidden">
+      {/* Subtle background noise */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none"></div>
 
       {/* Logo Section */}
@@ -54,6 +59,12 @@ export function Sidebar() {
             <p className="text-[10px] text-zinc-500 font-mono tracking-wider uppercase mt-0.5">Intelligence</p>
           </div>
         </Link>
+        <button 
+          onClick={() => setIsOpen(false)}
+          className="lg:hidden p-2 text-zinc-500 hover:text-white transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -67,8 +78,8 @@ export function Sidebar() {
               href={item.href}
               className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 relative ${
                 isActive
-                  ? 'text-white bg-white/10'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                   ? 'text-white bg-white/10'
+                   : 'text-zinc-400 hover:text-white hover:bg-white/5'
               }`}
             >
               {isActive && (
@@ -97,5 +108,38 @@ export function Sidebar() {
         </button>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col z-50">
+        {SidebarContent}
+      </div>
+
+      {/* Mobile Sidebar (Drawer) */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 w-[280px] z-[70] lg:hidden shadow-2xl"
+            >
+              {SidebarContent}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
