@@ -345,6 +345,8 @@ export default function CompaniesPage() {
                       <option value="greenhouse">Greenhouse ATS</option>
                       <option value="lever">Lever ATS</option>
                       <option value="ashby">Ashby ATS</option>
+                      <option value="breezy">Breezy HR</option>
+                      <option value="workable">Workable</option>
                       <option value="custom">Custom Web Scraper</option>
                     </select>
                   </div>

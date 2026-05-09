@@ -3,6 +3,9 @@ import { prisma } from '../prisma';
 import { redis } from '../redis';
 import { scrapeGreenhouse } from '../services/scrapers/greenhouse';
 import { scrapeLever } from '../services/scrapers/lever';
+import { scrapeAshby } from '../services/scrapers/ashby';
+import { scrapeBreezy } from '../services/scrapers/breezy';
+import { scrapeWorkable } from '../services/scrapers/workable';
 import { isDuplicateJob } from '../services/dedupe';
 import { calculateMatchScore } from '../services/jobMatcher';
 
@@ -33,6 +36,12 @@ export const worker = new Worker('scrapeCompany', async (job: Job) => {
       scrapedJobs = await scrapeGreenhouse(company.careerPageUrl, company.name);
     } else if (company.sourceType === 'lever') {
       scrapedJobs = await scrapeLever(company.careerPageUrl, company.name);
+    } else if (company.sourceType === 'ashby') {
+      scrapedJobs = await scrapeAshby(company.careerPageUrl, company.name);
+    } else if (company.sourceType === 'breezy') {
+      scrapedJobs = await scrapeBreezy(company.careerPageUrl, company.name);
+    } else if (company.sourceType === 'workable') {
+      scrapedJobs = await scrapeWorkable(company.careerPageUrl, company.name);
     } else {
       throw new Error(`Scraper for ${company.sourceType} not implemented yet.`);
     }

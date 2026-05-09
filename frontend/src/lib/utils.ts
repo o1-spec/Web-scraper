@@ -53,7 +53,7 @@ export function getRelativeTime(date: Date | string | null | undefined): string 
 }
 
 export function getSourceBadgeColor(
-  source: 'greenhouse' | 'lever' | 'ashby' | 'custom' | 'unknown'
+  source: 'greenhouse' | 'lever' | 'ashby' | 'breezy' | 'workable' | 'custom' | 'unknown'
 ): string {
   switch (source) {
     case 'greenhouse':
@@ -61,7 +61,11 @@ export function getSourceBadgeColor(
     case 'lever':
       return 'bg-purple-100 text-purple-800';
     case 'ashby':
-      return 'bg-green-100 text-green-800';
+      return 'bg-amber-100 text-amber-800';
+    case 'breezy':
+      return 'bg-pink-100 text-pink-800';
+    case 'workable':
+      return 'bg-indigo-100 text-indigo-800';
     case 'custom':
       return 'bg-gray-100 text-gray-800';
     default:
@@ -110,6 +114,10 @@ export function getSourceTypeLabel(sourceType: string): string {
       return 'Lever';
     case 'ashby':
       return 'Ashby';
+    case 'breezy':
+      return 'Breezy HR';
+    case 'workable':
+      return 'Workable';
     case 'custom':
       return 'Custom Page';
     default:

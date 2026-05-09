@@ -2,11 +2,11 @@ export type JobType = 'full-time' | 'part-time' | 'contract' | 'internship' | 'g
 
 export type JobLocation = 'remote' | 'on-site' | 'hybrid';
 
-export type JobSourcePlatform = 'greenhouse' | 'lever' | 'ashby' | 'custom' | 'unknown';
+export type JobSourcePlatform = 'greenhouse' | 'lever' | 'ashby' | 'breezy' | 'workable' | 'custom' | 'unknown';
 
 export type CompanyStatus = 'active' | 'failed' | 'pending';
 
-export type SourceType = 'greenhouse' | 'lever' | 'ashby' | 'custom';
+export type SourceType = 'greenhouse' | 'lever' | 'ashby' | 'breezy' | 'workable' | 'custom';
 
 export type DigestFrequency = 'daily' | 'every-2-days' | 'weekly';
 
