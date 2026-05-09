@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
 
     const { name, careerPageUrl, sourceType } = result.data;
 
-    // Check duplicate URL
     const existing = await prisma.company.findUnique({
       where: {
         userId_careerPageUrl: {

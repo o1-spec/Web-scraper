@@ -9,6 +9,7 @@ import {
   Tag,
   Settings,
   LogOut,
+  Activity,
 } from 'lucide-react';
 import { useAuth } from '@/providers/AuthProvider';
 import { useToast } from '@/providers/ToastProvider';
@@ -37,6 +38,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     { name: 'Jobs', href: '/jobs', icon: Briefcase },
     { name: 'Companies', href: '/companies', icon: Building2 },
     { name: 'Keywords', href: '/keywords', icon: Tag },
+    { name: 'Status', href: '/status', icon: Activity },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
@@ -52,10 +54,8 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
   const SidebarContent = (
     <div className="flex flex-col h-full bg-zinc-950 border-r border-white/10 relative overflow-hidden">
-      {/* Subtle background noise */}
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none"></div>
 
-      {/* Logo Section */}
       <div className="flex items-center justify-between px-6 py-6 border-b border-white/5 relative z-10">
         <Link href="/" className="flex items-center gap-3 group w-full">
           <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-all duration-300">
@@ -74,7 +74,6 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto relative z-10">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -104,7 +103,6 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         })}
       </nav>
 
-      {/* Footer */}
       <div className="border-t border-white/5 p-4 relative z-10">
         <button
           onClick={() => setShowLogoutModal(true)}

@@ -14,7 +14,6 @@ export default function SettingsPage() {
   const { addToast } = useToast();
   const [settings, setSettings] = useState<DigestSettings | null>(null);
 
-  // Sync server data to local state when it loads
   if (serverSettings && !settings) {
     setSettings(serverSettings);
   }
@@ -59,7 +58,6 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -74,9 +72,7 @@ export default function SettingsPage() {
         </div>
       </motion.div>
 
-      {/* Settings Grid */}
       <div className="grid gap-8 md:grid-cols-3">
-        {/* Left Column: Navigation/Sections (Placeholder for future routing, currently visual) */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -101,14 +97,12 @@ export default function SettingsPage() {
           </button>
         </motion.div>
 
-        {/* Right Column: Settings Content */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
           className="md:col-span-2 space-y-6"
         >
-          {/* Email Digest Card */}
           <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-border bg-muted/20">
               <h2 className="text-lg font-semibold tracking-tight text-foreground">Email Notifications</h2>
@@ -116,7 +110,6 @@ export default function SettingsPage() {
             </div>
 
             <div className="p-6 space-y-8">
-              {/* Enable Toggle */}
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-semibold text-foreground">Daily Summary</label>
@@ -133,7 +126,6 @@ export default function SettingsPage() {
                 </label>
               </div>
 
-              {/* Email Input */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground">Delivery Address</label>
                 <div className="relative group max-w-md">
